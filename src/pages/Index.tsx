@@ -10,6 +10,7 @@ import { Navigation } from "@/components/Navigation";
 import { ListingCard } from "@/components/ListingCard";
 import { SearchFilters } from "@/components/SearchFilters";
 import { useAuth } from "@/contexts/AuthContext";
+import { useListings, Listing } from "@/hooks/useListings";
 
 const Index = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -21,65 +22,25 @@ const Index = () => {
   });
 
   const { user, loading } = useAuth();
+  const { data: listings = [], isLoading } = useListings();
 
-  // Sample listings data
-  const sampleListings = [
-    {
-      id: 1,
-      title: "Complete First Year Group 1 Set",
-      books: ["BITS F110", "BIO F110", "BIO F111", "MATH F111", "BITS F112", "BITS F111", "CS F111"],
-      price: 5500,
-      quality: "Good",
-      seller: "Arjun K.",
-      rating: 4.8,
-      photos: 3,
-      type: "full-set",
-      group: "Group 1",
-      missingBooks: [],
-      averagePrice: 6000
-    },
-    {
-      id: 2,
-      title: "Partial Group 2 Set (4 Books)",
-      books: ["PHY F111", "CHEM F111", "MATH F112", "EEE F111"],
-      price: 3200,
-      quality: "Like New",
-      seller: "Priya S.",
-      rating: 4.9,
-      photos: 2,
-      type: "partial-set",
-      group: "Group 2",
-      missingBooks: ["ME F110", "MATH F113", "CHEM F110", "PHY F110"],
-      averagePrice: 3500
-    },
-    {
-      id: 3,
-      title: "MATH F111 Textbook",
-      books: ["MATH F111"],
-      price: 800,
-      quality: "Acceptable",
-      seller: "Rahul M.",
-      rating: 4.6,
-      photos: 1,
-      type: "individual",
-      group: "Group 1",
-      missingBooks: [],
-      averagePrice: 900
-    }
-  ];
-
-  const filteredListings = sampleListings.filter(listing => {
+  const filteredListings = listings.filter((listing: Listing) => {
     const matchesSearch = listing.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         listing.books.some(book => book.toLowerCase().includes(searchTerm.toLowerCase()));
+                         listing.listing_books.some(lb => 
+                           lb.book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           lb.book.course_code?.toLowerCase().includes(searchTerm.toLowerCase())
+                         );
     const matchesPrice = listing.price >= selectedFilters.priceRange[0] && listing.price <= selectedFilters.priceRange[1];
-    const matchesQuality = selectedFilters.quality.length === 0 || selectedFilters.quality.includes(listing.quality);
-    const matchesSetType = selectedFilters.setType === "all" || listing.type === selectedFilters.setType;
+    const matchesQuality = selectedFilters.quality.length === 0 || selectedFilters.quality.includes(listing.condition);
+    const matchesSetType = selectedFilters.setType === "all" || 
+                          (selectedFilters.setType === "full-set" && listing.is_set) ||
+                          (selectedFilters.setType === "individual" && !listing.is_set);
     
     return matchesSearch && matchesPrice && matchesQuality && matchesSetType;
   });
 
   // Show loading while checking auth state
-  if (loading) {
+  if (loading || isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
