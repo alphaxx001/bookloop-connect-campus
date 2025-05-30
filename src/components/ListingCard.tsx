@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +27,7 @@ interface ListingCardProps {
 
 export const ListingCard = ({ listing }: ListingCardProps) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const navigate = useNavigate();
   
   const getQualityColor = (quality: string) => {
     switch (quality) {
@@ -46,6 +48,10 @@ export const ListingCard = ({ listing }: ListingCardProps) => {
   };
 
   const isPriceGood = listing.price < listing.averagePrice;
+
+  const handleContactSeller = () => {
+    navigate(`/contact-seller/${listing.id}`);
+  };
 
   return (
     <Card className="hover:shadow-lg transition-shadow">
@@ -132,7 +138,10 @@ export const ListingCard = ({ listing }: ListingCardProps) => {
 
         {/* Actions */}
         <div className="flex gap-2">
-          <Button className="flex-1 bg-blue-600 hover:bg-blue-700">
+          <Button 
+            className="flex-1 bg-blue-600 hover:bg-blue-700"
+            onClick={handleContactSeller}
+          >
             <MessageSquare className="h-4 w-4 mr-2" />
             Contact Seller
           </Button>
