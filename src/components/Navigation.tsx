@@ -30,11 +30,19 @@ export const Navigation = () => {
           {/* Navigation Links - only show if authenticated */}
           {user && (
             <div className="hidden md:flex items-center space-x-8">
-              <Button variant="ghost" className="text-gray-600 hover:text-blue-600">
+              <Button 
+                variant="ghost" 
+                className="text-gray-600 hover:text-blue-600"
+                onClick={() => navigate("/buy-books")}
+              >
                 <Search className="h-4 w-4 mr-2" />
                 Buy Books
               </Button>
-              <Button variant="ghost" className="text-gray-600 hover:text-blue-600">
+              <Button 
+                variant="ghost" 
+                className="text-gray-600 hover:text-blue-600"
+                onClick={() => navigate("/sell-books")}
+              >
                 <BookOpen className="h-4 w-4 mr-2" />
                 Sell Books
               </Button>
