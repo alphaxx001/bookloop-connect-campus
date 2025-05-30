@@ -48,9 +48,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const signUp = async (email: string, password: string, fullName: string) => {
-    // Validate BITS Pilani email
-    if (!email.endsWith('@bits-pilani.ac.in')) {
-      return { error: { message: 'Please use your BITS Pilani email address (@bits-pilani.ac.in)' } };
+    // Validate BITS Pilani Hyderabad email
+    if (!email.endsWith('@hyderabad.bits-pilani.ac.in')) {
+      return { error: { message: 'Please use your BITS Pilani Hyderabad email address (@hyderabad.bits-pilani.ac.in)' } };
     }
 
     const { error } = await supabase.auth.signUp({
@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       options: {
         data: {
           full_name: fullName,
-          university: 'BITS Pilani'
+          university: 'BITS Pilani Hyderabad'
         }
       }
     });
@@ -68,9 +68,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signIn = async (email: string, password: string) => {
-    // Validate BITS Pilani email
-    if (!email.endsWith('@bits-pilani.ac.in')) {
-      return { error: { message: 'Please use your BITS Pilani email address (@bits-pilani.ac.in)' } };
+    // Validate BITS Pilani Hyderabad email
+    if (!email.endsWith('@hyderabad.bits-pilani.ac.in')) {
+      return { error: { message: 'Please use your BITS Pilani Hyderabad email address (@hyderabad.bits-pilani.ac.in)' } };
     }
 
     const { error } = await supabase.auth.signInWithPassword({

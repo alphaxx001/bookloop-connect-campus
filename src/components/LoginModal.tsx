@@ -27,7 +27,7 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
             <DialogTitle className="text-2xl">BookLoop</DialogTitle>
           </div>
           <DialogDescription className="text-center">
-            Join the BITS Pilani textbook marketplace
+            Join the BITS Pilani Hyderabad textbook marketplace
           </DialogDescription>
         </DialogHeader>
 
@@ -39,7 +39,7 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
             Login / Sign Up
           </Button>
           <p className="text-xs text-center text-gray-500">
-            Only BITS Pilani students (@bits-pilani.ac.in) can join
+            Only BITS Pilani Hyderabad students (@hyderabad.bits-pilani.ac.in) can join
           </p>
         </div>
       </DialogContent>

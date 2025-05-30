@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -87,7 +86,7 @@ export default function Auth() {
             <CardTitle className="text-2xl">BookLoop</CardTitle>
           </div>
           <CardDescription>
-            Join the BITS Pilani textbook marketplace
+            Join the BITS Pilani Hyderabad textbook marketplace
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -100,13 +99,13 @@ export default function Auth() {
             <TabsContent value="login">
               <form onSubmit={handleLogin} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="login-email">BITS Pilani Email</Label>
+                  <Label htmlFor="login-email">BITS Pilani Hyderabad Email</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
                       id="login-email"
                       type="email"
-                      placeholder="your.email@bits-pilani.ac.in"
+                      placeholder="your.email@hyderabad.bits-pilani.ac.in"
                       className="pl-10"
                       value={formData.email}
                       onChange={(e) => setFormData({...formData, email: e.target.value})}
@@ -115,7 +114,7 @@ export default function Auth() {
                   </div>
                   <div className="flex items-center text-xs text-amber-600 bg-amber-50 p-2 rounded">
                     <AlertCircle className="h-3 w-3 mr-1" />
-                    Must be a @bits-pilani.ac.in email address
+                    Must be a @hyderabad.bits-pilani.ac.in email address
                   </div>
                 </div>
                 
@@ -163,13 +162,13 @@ export default function Auth() {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">BITS Pilani Email</Label>
+                  <Label htmlFor="signup-email">BITS Pilani Hyderabad Email</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
                       id="signup-email"
                       type="email"
-                      placeholder="your.email@bits-pilani.ac.in"
+                      placeholder="your.email@hyderabad.bits-pilani.ac.in"
                       className="pl-10"
                       value={formData.email}
                       onChange={(e) => setFormData({...formData, email: e.target.value})}
@@ -178,7 +177,7 @@ export default function Auth() {
                   </div>
                   <div className="flex items-center text-xs text-amber-600 bg-amber-50 p-2 rounded">
                     <AlertCircle className="h-3 w-3 mr-1" />
-                    Must be a @bits-pilani.ac.in email address
+                    Must be a @hyderabad.bits-pilani.ac.in email address
                   </div>
                 </div>
                 
