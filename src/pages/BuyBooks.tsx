@@ -1,5 +1,5 @@
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import { ListingCard } from "@/components/ListingCard";
 import { SearchFilters } from "@/components/SearchFilters";
@@ -33,11 +33,12 @@ const BuyBooks = () => {
 
   const { data: listings = [], isLoading, error } = useListings();
 
-  // Redirect to auth if not logged in
-  if (!user) {
-    navigate("/auth");
-    return null;
-  }
+  // Use useEffect for navigation to avoid hooks rule violation
+  useEffect(() => {
+    if (!user) {
+      navigate("/auth");
+    }
+  }, [user, navigate]);
 
   const featuredListings = listings.slice(0, 2);
 
@@ -83,14 +84,15 @@ const BuyBooks = () => {
     return filtered;
   }, [listings, searchQuery, filters, sortBy]);
 
-  if (isLoading) {
+  // Show loading while checking auth state or loading listings
+  if (!user || isLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navigation />
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-center h-64">
             <Loader2 className="h-8 w-8 animate-spin" />
-            <span className="ml-2">Loading listings...</span>
+            <span className="ml-2">Loading...</span>
           </div>
         </div>
       </div>
