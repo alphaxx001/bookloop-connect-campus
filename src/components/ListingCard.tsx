@@ -1,10 +1,9 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Camera, Star, MessageSquare, Heart } from "lucide-react";
+import { Camera, Star, MessageSquare, Heart, Eye } from "lucide-react";
 
 interface Listing {
   id: number;
@@ -51,6 +50,10 @@ export const ListingCard = ({ listing }: ListingCardProps) => {
 
   const handleContactSeller = () => {
     navigate(`/contact-seller/${listing.id}`);
+  };
+
+  const handleViewDetails = () => {
+    navigate(`/view-details/${listing.id}`);
   };
 
   return (
@@ -145,7 +148,11 @@ export const ListingCard = ({ listing }: ListingCardProps) => {
             <MessageSquare className="h-4 w-4 mr-2" />
             Contact Seller
           </Button>
-          <Button variant="outline" size="sm">
+          <Button 
+            variant="outline" 
+            onClick={handleViewDetails}
+          >
+            <Eye className="h-4 w-4 mr-2" />
             View Details
           </Button>
         </div>
