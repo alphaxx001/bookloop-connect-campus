@@ -9,16 +9,18 @@ import { LoginModal } from "@/components/LoginModal";
 import { Navigation } from "@/components/Navigation";
 import { ListingCard } from "@/components/ListingCard";
 import { SearchFilters } from "@/components/SearchFilters";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilters, setSelectedFilters] = useState({
     priceRange: [0, 10000],
     quality: [],
     setType: "all"
   });
+
+  const { user, loading } = useAuth();
 
   // Sample listings data
   const sampleListings = [
@@ -76,7 +78,20 @@ const Index = () => {
     return matchesSearch && matchesPrice && matchesQuality && matchesSetType;
   });
 
-  if (!isLoggedIn) {
+  // Show loading while checking auth state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <BookOpen className="h-12 w-12 text-blue-600 mx-auto mb-4 animate-pulse" />
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show landing page for non-authenticated users
+  if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
         <div className="container mx-auto px-4 py-8">
@@ -167,7 +182,6 @@ const Index = () => {
           isOpen={isLoginOpen} 
           onClose={() => setIsLoginOpen(false)}
           onLogin={() => {
-            setIsLoggedIn(true);
             setIsLoginOpen(false);
           }}
         />
@@ -175,6 +189,7 @@ const Index = () => {
     );
   }
 
+  // Show authenticated app view
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />

@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function Auth() {
   const navigate = useNavigate();
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, user } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -20,6 +20,12 @@ export default function Auth() {
     fullName: "",
     confirmPassword: ""
   });
+
+  // Redirect authenticated users to home
+  if (user) {
+    navigate("/");
+    return null;
+  }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +44,7 @@ export default function Auth() {
         title: "Welcome back!",
         description: "Successfully logged in."
       });
-      navigate("/");
+      // Don't navigate here - let the auth state change handle it
     }
     
     setIsLoading(false);
@@ -71,7 +77,7 @@ export default function Auth() {
         title: "Account Created!",
         description: "Please check your email to verify your account."
       });
-      navigate("/");
+      // Don't navigate here - let the auth state change handle it
     }
     
     setIsLoading(false);
