@@ -7,27 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Search, Grid, List, Star } from "lucide-react";
+import { Search, Grid, List, Star, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-interface Listing {
-  id: number;
-  title: string;
-  books: string[];
-  price: number;
-  quality: string;
-  seller: string;
-  rating: number;
-  photos: number;
-  type: string;
-  group: string;
-  missingBooks: string[];
-  averagePrice: number;
-  datePosted: string;
-  author?: string;
-  courseCode?: string;
-  thumbnail?: string;
-}
+import { useListings } from "@/hooks/useListings";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 interface Filters {
   priceRange: number[];
@@ -36,6 +20,8 @@ interface Filters {
 }
 
 const BuyBooks = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("newest");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -45,81 +31,38 @@ const BuyBooks = () => {
     setType: "all"
   });
 
-  // Mock data - replace with actual API call
-  const mockListings: Listing[] = [
-    {
-      id: 1,
-      title: "Engineering Mathematics Set",
-      books: ["Advanced Calculus", "Linear Algebra", "Differential Equations"],
-      price: 2500,
-      quality: "Like New",
-      seller: "Rahul Kumar",
-      rating: 4.8,
-      photos: 5,
-      type: "partial-set",
-      group: "Engineering Group 1",
-      missingBooks: ["Probability Theory"],
-      averagePrice: 3000,
-      datePosted: "2024-01-25",
-      courseCode: "MATH101",
-      thumbnail: "/placeholder.svg"
-    },
-    {
-      id: 2,
-      title: "Physics Complete Set",
-      books: ["Mechanics", "Thermodynamics", "Electromagnetism", "Modern Physics"],
-      price: 1800,
-      quality: "Good",
-      seller: "Priya Sharma",
-      rating: 4.5,
-      photos: 8,
-      type: "full-set",
-      group: "Physics Group 1",
-      missingBooks: [],
-      averagePrice: 2200,
-      datePosted: "2024-01-24",
-      courseCode: "PHY101",
-      thumbnail: "/placeholder.svg"
-    },
-    {
-      id: 3,
-      title: "Data Structures and Algorithms",
-      books: ["Introduction to Algorithms"],
-      price: 800,
-      quality: "Acceptable",
-      seller: "Amit Patel",
-      rating: 4.2,
-      photos: 3,
-      type: "individual",
-      group: "Computer Science",
-      missingBooks: [],
-      averagePrice: 950,
-      datePosted: "2024-01-23",
-      author: "Thomas Cormen",
-      courseCode: "CS201",
-      thumbnail: "/placeholder.svg"
-    }
-  ];
+  const { data: listings = [], isLoading, error } = useListings();
 
-  const featuredListings = mockListings.slice(0, 2);
+  // Redirect to auth if not logged in
+  if (!user) {
+    navigate("/auth");
+    return null;
+  }
+
+  const featuredListings = listings.slice(0, 2);
 
   const filteredAndSortedListings = useMemo(() => {
-    let filtered = mockListings.filter(listing => {
+    let filtered = listings.filter(listing => {
       // Search filter
       const searchMatch = searchQuery === "" || 
         listing.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        listing.books.some(book => book.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        listing.author?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        listing.courseCode?.toLowerCase().includes(searchQuery.toLowerCase());
+        listing.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        listing.listing_books.some(lb => 
+          lb.book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          lb.book.author?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          lb.book.course_code?.toLowerCase().includes(searchQuery.toLowerCase())
+        );
 
       // Price filter
       const priceMatch = listing.price >= filters.priceRange[0] && listing.price <= filters.priceRange[1];
 
       // Quality filter
-      const qualityMatch = filters.quality.length === 0 || filters.quality.includes(listing.quality);
+      const qualityMatch = filters.quality.length === 0 || filters.quality.includes(listing.condition);
 
       // Set type filter
-      const typeMatch = filters.setType === "all" || listing.type === filters.setType;
+      const typeMatch = filters.setType === "all" || 
+        (filters.setType === "full-set" && listing.is_set) ||
+        (filters.setType === "individual" && !listing.is_set);
 
       return searchMatch && priceMatch && qualityMatch && typeMatch;
     });
@@ -131,16 +74,44 @@ const BuyBooks = () => {
           return a.price - b.price;
         case "price-high":
           return b.price - a.price;
-        case "rating":
-          return b.rating - a.rating;
         case "newest":
         default:
-          return new Date(b.datePosted).getTime() - new Date(a.datePosted).getTime();
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       }
     });
 
     return filtered;
-  }, [mockListings, searchQuery, filters, sortBy]);
+  }, [listings, searchQuery, filters, sortBy]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex items-center justify-center h-64">
+            <Loader2 className="h-8 w-8 animate-spin" />
+            <span className="ml-2">Loading listings...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <div className="container mx-auto px-4 py-6">
+          <Card className="text-center py-12">
+            <CardContent>
+              <h3 className="text-xl font-semibold mb-2">Error Loading Listings</h3>
+              <p className="text-gray-600">Sorry, we couldn't load the listings. Please try again later.</p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -154,33 +125,35 @@ const BuyBooks = () => {
         </div>
 
         {/* Featured Listings */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">Featured Listings</h2>
-          <div className="grid md:grid-cols-2 gap-4">
-            {featuredListings.map(listing => (
-              <Card key={listing.id} className="border-2 border-blue-200">
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between items-start">
-                    <CardTitle className="text-lg">{listing.title}</CardTitle>
-                    <Badge className="bg-blue-100 text-blue-800">Featured</Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="text-2xl font-bold text-green-600">₹{listing.price.toLocaleString()}</p>
-                      <p className="text-sm text-gray-600">{listing.quality}</p>
+        {featuredListings.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold mb-4">Featured Listings</h2>
+            <div className="grid md:grid-cols-2 gap-4">
+              {featuredListings.map(listing => (
+                <Card key={listing.id} className="border-2 border-blue-200">
+                  <CardHeader className="pb-2">
+                    <div className="flex justify-between items-start">
+                      <CardTitle className="text-lg">{listing.title}</CardTitle>
+                      <Badge className="bg-blue-100 text-blue-800">Featured</Badge>
                     </div>
-                    <div className="flex items-center">
-                      <Star className="h-4 w-4 text-yellow-400 mr-1 fill-current" />
-                      <span className="text-sm">{listing.rating}</span>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="text-2xl font-bold text-green-600">₹{listing.price.toLocaleString()}</p>
+                        <p className="text-sm text-gray-600">{listing.condition}</p>
+                      </div>
+                      <div className="flex items-center">
+                        <Star className="h-4 w-4 text-yellow-400 mr-1 fill-current" />
+                        <span className="text-sm">4.5</span>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Search and Filters */}
         <div className="mb-6 space-y-4">
@@ -212,7 +185,6 @@ const BuyBooks = () => {
                   <SelectItem value="newest">Newest First</SelectItem>
                   <SelectItem value="price-low">Price: Low to High</SelectItem>
                   <SelectItem value="price-high">Price: High to Low</SelectItem>
-                  <SelectItem value="rating">Highest Rated</SelectItem>
                 </SelectContent>
               </Select>
 

@@ -23,12 +23,11 @@ interface SearchFiltersProps {
 export const SearchFilters = ({ filters, onFiltersChange }: SearchFiltersProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const qualityOptions = ["Like New", "Good", "Acceptable"];
+  const qualityOptions = ["New", "Like New", "Good", "Acceptable"];
   const setTypeOptions = [
     { value: "all", label: "All Types" },
     { value: "individual", label: "Individual Books" },
-    { value: "partial-set", label: "Partial Sets" },
-    { value: "full-set", label: "Full Sets" }
+    { value: "full-set", label: "Book Sets" }
   ];
 
   const handleQualityChange = (quality: string, checked: boolean) => {
